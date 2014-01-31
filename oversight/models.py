@@ -1,0 +1,35 @@
+import json
+
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.module_loading import import_by_path
+from django.utils.timezone import now
+
+
+class Sensor(models.Model):
+    name = models.CharField(max_length=255)
+    api_endpoint = models.SlugField()
+    unit = models.CharField(max_length=255)
+    sensor_class = models.CharField(max_length=255)
+    params = models.TextField()
+    current_log = models.ForeignKey('LogEntry', null=True, related_name='+')
+
+    def clean(self):
+        try:
+            json.loads(self.params)
+        except ValueError:
+            raise ValidationError('Params is not a valid JSON object')
+
+    @property
+    def backend(self):
+        params = json.loads(self.params)
+        return import_by_path(self.sensor_class)(**params)
+
+    def __unicode__(self):
+        return self.name
+
+
+class LogEntry(models.Model):
+    datetime = models.DateTimeField(default=now)
+    sensor = models.ForeignKey(Sensor)
+    value = models.CharField(max_length=255)

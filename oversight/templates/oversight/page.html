@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{% load static from staticfiles %}
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{% static 'oversight/css/foundation.css' %}">
+  </head>
+  <body>
+    <nav class="top-bar" data-topbar>
+      <ul class="title-area">
+        <li class="name">
+        <h1><a href="{% url "oversight_index" %}">H.A.N.S</a></h1>
+        </li>
+        <li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+      </ul>
+      <section class="top-bar-section">
+        <ul class="right">
+          <li><a href="{% url "admin:index" %}">Login</a></li>
+        </ul>
+
+        <ul class="left">
+          <li><a href="{% url "oversight_index" %}">Home</a></li>
+        </ul>
+      </section>
+    </nav>
+    {% block content %}{% endblock %}
+    <script src="{% static 'oversight/js/jquery.js' %}"></script>
+    <script src="{% static 'oversight/js/foundation.min.js' %}"></script>
+    <script>
+      $(document).foundation();
+    </script>
+  </body>
+</html>

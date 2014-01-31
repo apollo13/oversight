@@ -1,0 +1,27 @@
+{% extends 'oversight/page.html' %}
+
+{% block content %}
+<div class="row">
+  <div class="small-12 columns">
+    <h3>Oversight</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>sensor name</th>
+          <th>sensor value</th>
+          <th>last update</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for sensor in sensor_data %}
+        <tr>
+          <td><a href="{% url 'oversight_sensor_detail' sensor.api_endpoint %}">{{ sensor.name }}</a></td>
+          <td>{{ sensor.current_log.value }} {{ sensor.unit }}</td>
+          <td>{{ sensor.current_log.datetime|date:"SHORT_DATETIME_FORMAT" }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
