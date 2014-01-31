@@ -2,6 +2,7 @@ from django.core.management.base import NoArgsCommand
 
 from oversight.models import Sensor, LogEntry
 
+
 class Command(NoArgsCommand):
     def handle(self, **options):
         for sensor in Sensor.objects.all():

@@ -8,11 +8,12 @@ from django.utils.timezone import now
 
 class Sensor(models.Model):
     name = models.CharField(max_length=255)
-    api_endpoint = models.SlugField()
+    api_endpoint = models.SlugField(unique=True)
     unit = models.CharField(max_length=255)
     sensor_class = models.CharField(max_length=255)
     params = models.TextField()
-    current_log = models.ForeignKey('LogEntry', null=True, related_name='+')
+    current_log = models.ForeignKey('LogEntry', null=True, blank=True,
+                                    related_name='+')
 
     def clean(self):
         try:

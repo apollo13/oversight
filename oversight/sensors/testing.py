@@ -8,7 +8,7 @@ class TestSensor(Sensor):
         pass
 
     def read(self):
-        return random.randint(1,100)
+        return random.randint(1, 100)
 
     def write(self, value):
         pass

@@ -1,4 +1,5 @@
 {% extends 'oversight/page.html' %}
+{% load static from staticfiles %}
 
 {% block content %}
 <div class="row">
@@ -21,6 +22,39 @@
       {% endfor %}
       </tbody>
     </table>
+    <div id="chart"></div>
   </div>
 </div>
+<script src="{% static 'oversight/js/d3.v3.min.js' %}"></script>
+<script src="{% static 'oversight/js/dimple.v1.1.4.min.js' %}"></script>
+<script>
+d3.json("{% url 'oversight_sensor_detail' sensor.api_endpoint %}?format=json", function(data) {
+  var svg = dimple.newSvg("#chart", 800, 600);
+  var chart = new dimple.chart(svg, data);
+  var xaxis = chart.addTimeAxis("x", "datetime", null, "%X");
+  var yaxis = chart.addMeasureAxis("y", "value");
+  var lines = chart.addSeries(null, dimple.plot.line);
+  // Find min and max
+  var d = chart._getAllData();
+  var dmin=d[0].value;
+  var dmax=d[0].value;
+  chart._getAllData().forEach(function(d) {
+    dmin = Math.min(dmin, d.value);
+    dmax = Math.max(dmax, d.value);
+  });
+  if (dmax == dmin) {
+    yaxis.overrideMin = dmin - 1;
+    yaxis.overrideMax = dmax + 1;
+  } else {
+    yaxis.overrideMin = dmin - (dmax - dmin) / 10;
+    yaxis.overrideMax = dmax + (dmax - dmin) / 10;
+  }
+  if (dmax < 1) {
+    yaxis.tickFormat = '.2e';
+  } else {
+    yaxis.tickFormat = '.2f';
+  }
+  chart.draw();
+});
+</script>
 {% endblock %}
