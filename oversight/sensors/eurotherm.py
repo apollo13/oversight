@@ -17,3 +17,10 @@ class EuroTherm(Sensor):
                                         signed=True)
         instrument.serial.close()
         return round(data, 2)
+
+    def write(self, value):
+        instrument = minimalmodbus.Instrument(self.port, 1)
+        data = instrument.write_register(self.register, value, self.number_of_decimals,
+                                         signed=True)
+        instrument.serial.close()
+        return ''

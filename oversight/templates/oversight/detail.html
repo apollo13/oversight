@@ -22,39 +22,73 @@
       {% endfor %}
       </tbody>
     </table>
-    <div id="chart"></div>
+    <div id="chart" style="width:900px; height:700px;"></div>
   </div>
 </div>
-<script src="{% static 'oversight/js/d3.v3.min.js' %}"></script>
-<script src="{% static 'oversight/js/dimple.v1.1.4.min.js' %}"></script>
-<script>
-d3.json("{% url 'oversight_sensor_detail' sensor.api_endpoint %}?format=json", function(data) {
-  var svg = dimple.newSvg("#chart", 800, 600);
-  var chart = new dimple.chart(svg, data);
-  var xaxis = chart.addTimeAxis("x", "datetime", null, "%X");
-  var yaxis = chart.addMeasureAxis("y", "value");
-  var lines = chart.addSeries(null, dimple.plot.line);
-  // Find min and max
-  var d = chart._getAllData();
-  var dmin=d[0].value;
-  var dmax=d[0].value;
-  chart._getAllData().forEach(function(d) {
-    dmin = Math.min(dmin, d.value);
-    dmax = Math.max(dmax, d.value);
-  });
-  if (dmax == dmin) {
-    yaxis.overrideMin = dmin - 1;
-    yaxis.overrideMax = dmax + 1;
-  } else {
-    yaxis.overrideMin = dmin - (dmax - dmin) / 10;
-    yaxis.overrideMax = dmax + (dmax - dmin) / 10;
-  }
-  if (dmax < 1) {
-    yaxis.tickFormat = '.2e';
-  } else {
-    yaxis.tickFormat = '.2f';
-  }
-  chart.draw();
-});
-</script>
 {% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script language="javascript" type="text/javascript" src="{% static 'jqplot/jquery.jqplot.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'jqplot/plugins/jqplot.dateAxisRenderer.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'jqplot/plugins/jqplot.logAxisRenderer.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'jqplot/plugins/jqplot.canvasTextRenderer.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'jqplot/plugins/jqplot.categoryAxisRenderer.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'jqplot/jquery.jqplot.css' %}" />
+<script>
+  var log_plot = {{ sensor.log_plot|yesno:"1,0" }};
+  $(document).ready(function(){
+
+    var ajaxDataRenderer = function(url, plot, options) {
+      var ret = null;
+      $.ajax({
+        async: false,
+        url: url,
+        dataType:"json",
+        success: function(data) {
+          ret = $.map(data, function(elem, index) {
+            return [[new Date(elem[0]), parseFloat(elem[1])]];
+          });
+        }
+      });
+      console.debug(ret.length);
+      return [ret];
+    };
+
+    // The url for our json data
+    var jsonurl = "{% url 'oversight_sensor_detail' sensor.api_endpoint %}?format=json";
+
+    // passing in the url string as the jqPlot data argument is a handy
+    // shortcut for our renderer.  You could also have used the
+    // "dataRendererOptions" option to pass in the url.
+    var yaxis = {};
+    if (log_plot) {
+      yaxis = {
+        renderer: $.jqplot.LogAxisRenderer,
+        tickOptions: {
+          formatString: "%.2e",
+        }
+      };
+    }
+    var plot2 = $.jqplot('chart', jsonurl, {
+      title: "",
+      dataRenderer: ajaxDataRenderer,
+      dataRendererOptions: {
+        unusedOptionalUrl: jsonurl
+      },
+      axes: {
+        xaxis: {
+          renderer:$.jqplot.DateAxisRenderer,
+          tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+          tickOptions: {
+            angle: -30,
+            fontSize: '10pt'
+          }
+        },
+        yaxis: yaxis
+      },
+      series: [{showMarker: false}],
+    });
+  });
+</script>
+{% endblock scripts %}

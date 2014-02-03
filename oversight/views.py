@@ -1,10 +1,15 @@
 import json
+import xmlrpclib
 from datetime import timedelta
 
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils.timezone import now
+from django.utils.crypto import constant_time_compare
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Sensor, LogEntry
 
@@ -19,7 +24,7 @@ def sensor_detail(request, slug):
     if request.GET.get('format') == 'json':
         sensor_data = LogEntry.objects\
             .filter(sensor=sensor, datetime__gt=now()-timedelta(days=2))\
-            .order_by('datetime').values('datetime', 'value')
+            .order_by('datetime').values_list('datetime', 'value')
         sensor_data = json.dumps(list(sensor_data), cls=DjangoJSONEncoder)
         return HttpResponse(sensor_data)
     else:
@@ -31,12 +36,12 @@ def sensor_detail(request, slug):
         return render(request, 'oversight/detail.html', context)
 
 
-def sensor_api(request, slug):
-    return HttpResponse('')
+@csrf_exempt
+def sensor_api(request, slug, action):
+    # TODO: switch to post
+    data = request.GET
+    if not constant_time_compare(data.get('api-key', ''), settings.OVERSIGHT_KEY):
+        raise PermissionDenied
     sensor = Sensor.objects.get(api_endpoint=slug)
-    backend = sensor.backend
-    if request.method == 'GET':
-        data = backend.to_string(backend.read())
-    elif request.method == 'POST':
-        data = backend.write(backend.from_string('123'))
-    return HttpResponse(data)
+    proxy = xmlrpclib.ServerProxy('http://localhost:12345', allow_none=True)
+    return HttpResponse(proxy.api(slug, action, data.getlist('args')))

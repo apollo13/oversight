@@ -3,6 +3,8 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="{% static 'oversight/css/foundation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'oversight/css/oversight.css' %}">
+    {% block head %}{% endblock %}
   </head>
   <body>
     <nav class="top-bar" data-topbar>
@@ -27,10 +29,12 @@
       </section>
     </nav>
     {% block content %}{% endblock %}
+    {% block scripts %}
     <script src="{% static 'oversight/js/jquery.js' %}"></script>
     <script src="{% static 'oversight/js/foundation.min.js' %}"></script>
     <script>
       $(document).foundation();
     </script>
+    {% endblock scripts %}
   </body>
 </html>

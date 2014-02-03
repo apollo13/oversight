@@ -14,6 +14,7 @@ class Sensor(models.Model):
     params = models.TextField()
     current_log = models.ForeignKey('LogEntry', null=True, blank=True,
                                     related_name='+')
+    log_plot = models.BooleanField(default=False)
 
     def clean(self):
         try:
@@ -25,6 +26,10 @@ class Sensor(models.Model):
     def backend(self):
         params = json.loads(self.params)
         return import_by_path(self.sensor_class)(**params)
+
+    @property
+    def frozen(self):
+        return (now() - self.current_log.datetime).total_seconds() > 300
 
     def __unicode__(self):
         return self.name
