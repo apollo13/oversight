@@ -38,8 +38,7 @@ def sensor_detail(request, slug):
 
 @csrf_exempt
 def sensor_api(request, slug, action):
-    # TODO: switch to post
-    data = request.GET
+    data = request.POST
     if not constant_time_compare(data.get('api-key', ''), settings.OVERSIGHT_KEY):
         raise PermissionDenied
     sensor = Sensor.objects.get(api_endpoint=slug)

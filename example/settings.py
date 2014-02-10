@@ -82,3 +82,20 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 OVERSIGHT_KEY = 'hallo'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'handlers': {
+        'console': {
+            'class': 'logging.FileHandler',
+            'filename': '/dev/stderr',
+        }
+    },
+    'loggers': {
+        'oversight': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    }
+}

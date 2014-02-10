@@ -1,3 +1,4 @@
+import logging
 import threading
 import xmlrpclib
 import Queue
@@ -7,6 +8,9 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 from django.core.management.base import NoArgsCommand
 
 from oversight.models import Sensor, LogEntry
+
+
+logger = logging.getLogger(__name__)
 
 
 def read_sensors():
@@ -34,14 +38,17 @@ TASKS = {
 
 def schedule_sensor_checks(queue):
     queue.put(('read_sensors',))
-    timer = threading.Timer(180, schedule_sensor_checks, args=[queue])
+    timer = threading.Timer(10, schedule_sensor_checks, args=[queue])
     timer.start()
 
 
 def worker(queue):
     while True:
         item = queue.get()
-        TASKS[item[0]](*item[1:])
+        try:
+            TASKS[item[0]](*item[1:])
+        except Exception as e:
+            logger.error("Task failed: ", exc_info=e)
         queue.task_done()
 
 
