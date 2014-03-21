@@ -1,0 +1,37 @@
+---
+- name: Basic Configuration
+  hosts: oversight
+  remote_user: pi
+  gather_facts: no
+  sudo: true
+
+  roles:
+    - common
+
+- name: Oversight Bootstrap
+  hosts: oversight
+  remote_user: pi
+  gather_facts: no
+  sudo: true
+
+  tasks:
+    - user: name=oversight home=/oversight
+
+  roles:
+    - nginx
+
+  tags:
+    - bootstrap
+
+- name: Oversight Deployment
+  hosts: oversight
+  remote_user: pi
+  gather_facts: no
+  sudo: true
+  sudo_user: oversight
+
+  roles:
+    - oversight
+
+  tags:
+    - deployment

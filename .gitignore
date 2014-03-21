@@ -1,2 +1,4 @@
 *.pyc
 db.sqlite3
+ansible/hosts
+ansible/groups_vars/oversight

@@ -1,0 +1,52 @@
+---
+
+- name: folder structure
+  file: dest=/oversight/{{ item }} state=directory
+  with_items:
+    - config
+    - logs
+    - db
+    - static
+
+- name: install config file
+  copy: dest=/oversight/config/settings.py src=settings.py
+
+- name: install server wrapper
+  template: dest=/oversight/config/server.py src=server.py
+
+- name: enable server in cron
+  cron:
+    name: Oversight server
+    special_time: reboot
+    job: /oversight/venv/bin/python /oversight/config/server.py
+
+- name: update pip
+  pip: name=pip virtualenv=/oversight/venv state=latest
+
+- name: oversight deps
+  pip: name={{ item }} virtualenv=/oversight/venv
+  with_items:
+    - pyserial
+    - MinimalModbus
+    - https://www.djangoproject.com/download/1.7b1/tarball/
+    - CherryPy
+
+- name: update oversight
+  git: repo=https://github.com/apollo13/oversight.git dest=/oversight/code update=yes
+
+- name: collect static files
+  django_manage:
+    command: collectstatic
+    app_path: /oversight/code
+    settings: settings
+    pythonpath: /oversight/config
+    virtualenv: /oversight/venv
+
+- name: migrate database
+  django_manage:
+    command: migrate
+    app_path: /oversight/code
+    settings: settings
+    pythonpath: /oversight/config
+    virtualenv: /oversight/venv
+

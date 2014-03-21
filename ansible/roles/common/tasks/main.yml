@@ -1,0 +1,14 @@
+---
+
+- name: ensure python-apt
+  shell: apt-get -y install python-apt creates=/usr/share/pyshared/apt
+
+- name: common packages
+  apt: pkg={{ item }}
+  with_items:
+    - python-pip
+    - python-virtualenv
+    - vim
+
+- name: decrease gpu memory
+  lineinfile: dest=/boot/config.txt line=gpu_mem=16

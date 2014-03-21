@@ -13,6 +13,9 @@ from oversight.models import Sensor, LogEntry
 logger = logging.getLogger(__name__)
 
 
+SENSOR_INTERVAL = 60
+
+
 def read_sensors():
     for sensor in Sensor.objects.all():
         backend = sensor.backend
@@ -38,7 +41,7 @@ TASKS = {
 
 def schedule_sensor_checks(queue):
     queue.put(('read_sensors',))
-    timer = threading.Timer(10, schedule_sensor_checks, args=[queue])
+    timer = threading.Timer(SENSOR_INTERVAL, schedule_sensor_checks, args=[queue])
     timer.start()
 
 
