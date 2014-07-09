@@ -18,7 +18,7 @@
   sudo: true
 
   tasks:
-    - user: name=oversight home=/oversight
+    - user: name=oversight home=/oversight groups=dialout
 
   roles:
     - nginx
