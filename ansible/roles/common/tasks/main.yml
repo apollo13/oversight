@@ -10,5 +10,32 @@
     - python-virtualenv
     - vim
 
+- name: remove unneeded packages
+  apt: pkg=triggerhappy state=absent
+
 - name: decrease gpu memory
   lineinfile: dest=/boot/config.txt line=gpu_mem=16
+
+- name: disable serial and ttys
+  replace: dest=/etc/inittab regexp={{ item }} replace="#\1" backup=yes
+  with_items:
+    - ^(T0:23.*)$
+    - ^([2-6]:23.*)$
+
+- name: disable ipv6 1/2
+  copy: dest=/etc/sysctl.d/disableipv6.conf content="net.ipv6.conf.all.disable_ipv6=1\n" mode=0644
+
+- name: disable ipv6 2/2
+  lineinfile: dest=/etc/modprobe.d/blacklist line="blacklist ipv6" create=yes mode=0644
+
+- name: set noatime and nodiratime
+  replace: dest=/etc/fstab backup=yes regexp=noatime(?!,nodiratime) replace=noatime,nodiratime
+
+- name: enable noop scheduler
+  replace: dest=/boot/cmdline.txt regexp="elevator=deadline" replace="elevator=noop"
+
+- name: disable ssh root login
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin (yes|no)$" line="PermitRootLogin no"
+  notify: restart ssh
+
+# TODO: kill syslog

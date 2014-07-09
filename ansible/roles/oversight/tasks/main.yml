@@ -9,10 +9,10 @@
     - static
 
 - name: install config file
-  copy: dest=/oversight/config/settings.py src=settings.py
+  template: dest=/oversight/config/settings.py src=settings.py.j2
 
 - name: install server wrapper
-  template: dest=/oversight/config/server.py src=server.py
+  copy: dest=/oversight/config/server.py src=server.py
 
 - name: enable server in cron
   cron:
@@ -28,7 +28,7 @@
   with_items:
     - pyserial
     - MinimalModbus
-    - https://www.djangoproject.com/download/1.7b1/tarball/
+    - https://www.djangoproject.com/download/1.7c1/tarball/
     - CherryPy
 
 - name: update oversight
@@ -49,4 +49,3 @@
     settings: settings
     pythonpath: /oversight/config
     virtualenv: /oversight/venv
-

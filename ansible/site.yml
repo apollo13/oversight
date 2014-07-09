@@ -8,6 +8,9 @@
   roles:
     - common
 
+  tags:
+    - basic
+
 - name: Oversight Bootstrap
   hosts: oversight
   remote_user: pi
