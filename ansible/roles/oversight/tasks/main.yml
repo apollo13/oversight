@@ -20,6 +20,12 @@
     special_time: reboot
     job: /oversight/venv/bin/python /oversight/config/server.py
 
+- name: enable sensor daemon in cron
+  cron:
+    name: Oversight sensor daemon
+    special_time: reboot
+    job: PYTHONPATH=/oversight/code:/oversight/config /oversight/venv/bin/python /oversight/code/manage.py --settings=settings sensordaemon
+
 - name: update pip
   pip: name=pip virtualenv=/oversight/venv state=latest
 
