@@ -6,7 +6,7 @@
   file: path=/etc/nginx/ssl mode=700 owner=root state=directory
 
 - name: install config
-  copy: dest=/etc/nginx/nginx.conf src=nginx.conf
+  template: dest=/etc/nginx/nginx.conf src=nginx.conf
   notify: restart nginx
 
 - name: install privkey
