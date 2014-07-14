@@ -2,6 +2,18 @@
 - name: install nginx
   apt: pkg=nginx-light
 
+- name: create ssl dir
+  file: path=/etc/nginx/ssl mode=700 owner=root state=directory
+
 - name: install config
   copy: dest=/etc/nginx/nginx.conf src=nginx.conf
   notify: restart nginx
+
+- name: install privkey
+  copy: dest=/etc/nginx/ssl/server.key content="{{ ssl_privkey }}" mode=600 owner=root
+  notify: restart nginx
+
+- name: install pubkey
+  copy: dest=/etc/nginx/ssl/server.crt content="{{ ssl_pubkey }}" mode=600 owner=root
+  notify: restart nginx
+
