@@ -35,7 +35,7 @@
 <script type="text/javascript" language="javascript" src="{% static 'jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'jqplot/plugins/jqplot.categoryAxisRenderer.min.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'jqplot/jquery.jqplot.css' %}" />
-<script>
+<script async>
   var log_plot = {{ sensor.log_plot|yesno:"1,0" }};
   $(document).ready(function(){
 

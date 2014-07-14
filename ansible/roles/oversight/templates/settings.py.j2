@@ -97,3 +97,9 @@ LOGGING = {
 }
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
+TEMPLATE_LOADERS = (
+  ('django.template.loaders.cached.Loader', (
+    'django.template.loaders.app_directories.Loader',
+  )),
+)
