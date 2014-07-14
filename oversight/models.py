@@ -36,6 +36,9 @@ class Sensor(models.Model):
 
 
 class LogEntry(models.Model):
-    datetime = models.DateTimeField(default=now, db_index=True)
+    datetime = models.DateTimeField(default=now)
     sensor = models.ForeignKey(Sensor)
     value = models.CharField(max_length=255)
+
+    class Meta:
+        index_together = (('sensor', 'datetime'),)
