@@ -36,6 +36,6 @@ class Sensor(models.Model):
 
 
 class LogEntry(models.Model):
-    datetime = models.DateTimeField(default=now)
+    datetime = models.DateTimeField(default=now, db_index=True)
     sensor = models.ForeignKey(Sensor)
     value = models.CharField(max_length=255)
