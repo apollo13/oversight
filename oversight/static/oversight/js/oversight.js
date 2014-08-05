@@ -38,6 +38,7 @@ var render_plot = function(id) {
 					}
 				};
 			}
+			$('#'+id).html('');
 			$.jqplot(id, {
 				title: "",
 				data: data,

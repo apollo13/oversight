@@ -10,7 +10,7 @@
       <li>{{ sensor.name }}</li>
     {% endfor %}
     </ul>
-    <div id="chart" style="width:900px; height:700px;" data-url="{{ request.get_full_path|safe }}&format=json"></div>
+    <div id="chart" style="width:900px; height:700px;" data-url="{{ request.get_full_path|safe }}&format=json"><h3>Retrieving data…</h3></div>
   </div>
 </div>
 {% endblock %}
