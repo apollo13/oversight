@@ -4,24 +4,29 @@
 <div class="row">
   <div class="small-12 columns">
     <h3>Oversight @ {% now "SHORT_DATETIME_FORMAT" %}</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>sensor name</th>
-          <th>sensor value</th>
-          <th>last update</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for sensor in sensor_data %}
-        <tr>
-          <td><a href="{% url 'oversight_sensor_detail' sensor.api_endpoint %}">{{ sensor.name }}</a></td>
-          <td>{{ sensor.current_log.value }} {{ sensor.unit }}</td>
-          <td {% if sensor.frozen %}class="frozen"{% endif %}>{{ sensor.current_log.datetime|date:"SHORT_DATETIME_FORMAT" }}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <form action="{% url 'oversight_sensor_compare' %}">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>sensor name</th>
+            <th>sensor value</th>
+            <th>last update</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for sensor in sensor_data %}
+          <tr>
+            <td><input type="checkbox" name="sensor" value="{{ sensor.api_endpoint }}"/></td>
+            <td><a href="{% url 'oversight_sensor_detail' sensor.api_endpoint %}">{{ sensor.name }}</a></td>
+            <td>{{ sensor.current_log.value }} {{ sensor.unit }}</td>
+            <td {% if sensor.frozen %}class="frozen"{% endif %}>{{ sensor.current_log.datetime|date:"SHORT_DATETIME_FORMAT" }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <input type="submit" value="Compare sensors"/>
+    </form>
   </div>
 </div>
 {% endblock %}

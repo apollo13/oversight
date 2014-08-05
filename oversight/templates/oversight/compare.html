@@ -4,28 +4,17 @@
 {% block content %}
 <div class="row">
   <div class="small-12 columns">
-    <h3>Details for {{ sensor.name }}</h3>
-    <p>Last updated {{ sensor_data.0.datetime }}</p>
-    <table>
-      <thead>
-        <tr>
-          <th>sensor value</th>
-          <th>time</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for log in sensor_data %}
-        <tr>
-          <td>{{ log.value }} {{ sensor.unit }}</td>
-          <td>{{ log.datetime|date:"SHORT_DATETIME_FORMAT" }}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    <div id="chart" style="width:900px; height:700px;" data-url="{% url 'oversight_sensor_detail' sensor.api_endpoint %}?format=json"></div>
+    <h3>Comparing sensor data for:</h3>
+    <ul>
+    {% for sensor in sensors %}
+      <li>{{ sensor.name }}</li>
+    {% endfor %}
+    </ul>
+    <div id="chart" style="width:900px; height:700px;" data-url="{{ request.get_full_path|safe }}&format=json"></div>
   </div>
 </div>
 {% endblock %}
+
 {% block scripts %}
 {{ block.super }}
 <script language="javascript" type="text/javascript" src="{% static 'jqplot/jquery.jqplot.js' %}"></script>

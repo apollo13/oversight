@@ -1,17 +1,27 @@
-import json
 import xmlrpclib
 from datetime import timedelta
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils.timezone import now
 from django.utils.crypto import constant_time_compare
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Sensor, LogEntry
+
+
+def _prepare_json_data(*sensors):
+    data = []
+    for sensor in sensors:
+        sensor_data = LogEntry.objects\
+            .filter(sensor=sensor, datetime__gt=now()-timedelta(days=2))\
+            .order_by('datetime').values_list('datetime', 'value')
+        data.append({'points': list(sensor_data),
+                     'log_plot': sensor.log_plot})
+
+    return data
 
 
 def index(request):
@@ -22,11 +32,7 @@ def index(request):
 def sensor_detail(request, slug):
     sensor = Sensor.objects.get(api_endpoint=slug)
     if request.GET.get('format') == 'json':
-        sensor_data = LogEntry.objects\
-            .filter(sensor=sensor, datetime__gt=now()-timedelta(days=2))\
-            .order_by('datetime').values_list('datetime', 'value')
-        sensor_data = json.dumps(list(sensor_data), cls=DjangoJSONEncoder)
-        return HttpResponse(sensor_data)
+        return JsonResponse(_prepare_json_data(sensor), safe=False)
     else:
         sensor_data = LogEntry.objects.filter(sensor=sensor).order_by('-datetime')[:5]
         context = {
@@ -35,6 +41,15 @@ def sensor_detail(request, slug):
         }
         return render(request, 'oversight/detail.html', context)
 
+
+def sensor_compare(request):
+    sensors = request.GET.getlist('sensor')
+    sensors = Sensor.objects.filter(api_endpoint__in = sensors)
+    if request.GET.get('format') == 'json':
+        return JsonResponse(_prepare_json_data(*sensors), safe=False)
+    else:
+        context = {'sensors': sensors}
+        return render(request, 'oversight/compare.html', context)
 
 @csrf_exempt
 def sensor_api(request, slug, action):
