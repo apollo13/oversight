@@ -52,7 +52,10 @@ var render_plot = function(id) {
 					},
 					yaxis: yaxis,
 				},
-				legend: {show: true},
+				legend: {
+					show: true,
+					location: 'nw'
+				},
 				series: series
 			});
 		}
