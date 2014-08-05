@@ -26,13 +26,12 @@ class Sensor(object):
 
     def from_string(self, value):
         return float(value)
-        #raise NotImplementedError("Subclasses need to implement that method")
 
     @property
     @contextmanager
     def lock(self):
         l = None
-        if hasattr(self, 'port') and not self.port in LOCAL_LOCKS:
+        if hasattr(self, 'port') and self.port not in LOCAL_LOCKS:
             with GLOBAL_LOCK:
                 l = LOCAL_LOCKS[self.port] = threading.Lock()
         if l:
@@ -40,5 +39,3 @@ class Sensor(object):
                 yield self
         else:
             yield self
-
-

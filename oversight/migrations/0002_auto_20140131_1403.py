@@ -3,7 +3,7 @@ from django.db import models, migrations
 
 
 class Migration(migrations.Migration):
-    
+
     dependencies = [
         ('oversight', '0001_logentry_sensor'),
     ]

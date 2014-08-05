@@ -3,7 +3,7 @@ from django.db import models, migrations
 
 
 class Migration(migrations.Migration):
-    
+
     dependencies = [
         ('oversight', '0002_auto_20140131_1403'),
     ]

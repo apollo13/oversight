@@ -1,8 +1,6 @@
 import logging
 import threading
-import xmlrpclib
 import Queue
-import functools
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 from django.core.management.base import NoArgsCommand
@@ -66,4 +64,3 @@ class Command(NoArgsCommand):
         schedule_sensor_checks(queue)
         threading.Thread(target=worker, args=[queue]).start()
         server.serve_forever()
-

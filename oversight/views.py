@@ -44,18 +44,18 @@ def sensor_detail(request, slug):
 
 def sensor_compare(request):
     sensors = request.GET.getlist('sensor')
-    sensors = Sensor.objects.filter(api_endpoint__in = sensors)
+    sensors = Sensor.objects.filter(api_endpoint__in=sensors)
     if request.GET.get('format') == 'json':
         return JsonResponse(_prepare_json_data(*sensors), safe=False)
     else:
         context = {'sensors': sensors}
         return render(request, 'oversight/compare.html', context)
 
+
 @csrf_exempt
 def sensor_api(request, slug, action):
     data = request.POST
     if not constant_time_compare(data.get('api-key', ''), settings.OVERSIGHT_KEY):
         raise PermissionDenied
-    sensor = Sensor.objects.get(api_endpoint=slug)
     proxy = xmlrpclib.ServerProxy('http://localhost:12345', allow_none=True)
     return HttpResponse(proxy.api(slug, action, data.getlist('args')))
