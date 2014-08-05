@@ -18,7 +18,7 @@ def _prepare_json_data(*sensors):
         sensor_data = LogEntry.objects\
             .filter(sensor=sensor, datetime__gt=now()-timedelta(days=2))\
             .order_by('datetime').values_list('datetime', 'value')
-        data.append({'points': list(sensor_data),
+        data.append({'points': list(sensor_data), 'name': sensor.name,
                      'log_plot': sensor.log_plot})
 
     return data

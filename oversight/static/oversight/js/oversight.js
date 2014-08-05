@@ -16,7 +16,9 @@ var render_plot = function(id) {
 				data.push($.map(value.points, function(elem, index) {
 					return [[new Date(elem[0]), parseFloat(elem[1])]];
 				}));
-				series.push({showMarker: false, logPlot: value.log_plot});
+				series.push({showMarker: false,
+                     logPlot: value.log_plot,
+                     label: value.name});
 				if (value.log_plot) {
 					log_plot = true;
 				}
@@ -50,6 +52,7 @@ var render_plot = function(id) {
 					},
 					yaxis: yaxis,
 				},
+				legend: {show: true},
 				series: series
 			});
 		}
