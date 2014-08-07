@@ -9,7 +9,7 @@
     - common
 
   tags:
-    - basic
+    - bootstrap
 
 - name: Oversight Bootstrap
   hosts: oversight
@@ -22,6 +22,7 @@
 
   roles:
     - nginx
+    - supervisor
 
   tags:
     - bootstrap

@@ -14,18 +14,6 @@
 - name: install server wrapper
   copy: dest=/oversight/config/server.py src=server.py
 
-- name: enable server in cron
-  cron:
-    name: Oversight server
-    special_time: reboot
-    job: /oversight/venv/bin/python /oversight/config/server.py
-
-- name: enable sensor daemon in cron
-  cron:
-    name: Oversight sensor daemon
-    special_time: reboot
-    job: PYTHONPATH=/oversight/code:/oversight/config /oversight/venv/bin/python /oversight/code/manage.py sensordaemon --settings=settings
-
 - name: update pip
   pip: name=pip virtualenv=/oversight/venv state=latest
 
@@ -55,3 +43,17 @@
     settings: settings
     pythonpath: /oversight/config
     virtualenv: /oversight/venv
+
+- name: install supervisor config file
+  copy: dest=/etc/supervisor/conf.d/oversight.conf src=oversight.conf
+  sudo_user: root
+  register: supervisor_config
+
+- name: reread supervisor config
+  supervisorctl: state=present name="oversight:" server_url="unix:////var/run/supervisor.sock"
+  sudo_user: root
+  when: supervisor_config|changed
+
+- name: restart oversight programs
+  supervisorctl: state=restarted name="oversight:" server_url="unix:////var/run/supervisor.sock"
+  sudo_user: root

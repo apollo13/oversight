@@ -16,4 +16,3 @@
 - name: install pubkey
   copy: dest=/etc/nginx/ssl/server.crt content="{{ ssl_pubkey }}" mode=600 owner=root
   notify: restart nginx
-
