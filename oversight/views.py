@@ -44,7 +44,8 @@ def sensor_detail(request, slug):
 
 def sensor_compare(request):
     sensors = request.GET.getlist('sensor')
-    sensors = Sensor.objects.filter(api_endpoint__in=sensors)
+    sensors = Sensor.objects.filter(api_endpoint__in=sensors) \
+        .select_related('current_log').order_by('name')
     if request.GET.get('format') == 'json':
         return JsonResponse(_prepare_json_data(*sensors), safe=False)
     else:
