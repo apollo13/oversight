@@ -22,7 +22,7 @@
   with_items:
     - pyserial
     - MinimalModbus
-    - https://www.djangoproject.com/download/1.7c2/tarball/
+    - Django
     - CherryPy
 
 - name: update oversight
