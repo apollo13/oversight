@@ -18,7 +18,8 @@ def read_sensors():
     for sensor in Sensor.objects.all():
         backend = sensor.backend
         try:
-            value = backend.to_string(backend.read())
+            with backend.lock:
+                value = backend.to_string(backend.read())
         except Exception as e:
             logger.error("Task failed: ", exc_info=e)
             continue

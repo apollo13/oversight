@@ -30,12 +30,14 @@ class Sensor(object):
     @property
     @contextmanager
     def lock(self):
-        l = None
-        if hasattr(self, 'port') and self.port not in LOCAL_LOCKS:
-            with GLOBAL_LOCK:
-                l = LOCAL_LOCKS[self.port] = threading.Lock()
-        if l:
-            with l:
-                yield self
+        if hasattr(self, 'port'):
+            if self.port not in LOCAL_LOCKS:
+                with GLOBAL_LOCK:
+                    if self.port not in LOCAL_LOCKS:
+                        LOCAL_LOCKS[self.port] = threading.Lock()
+
+            with LOCAL_LOCKS[self.port]:
+                yield
+
         else:
-            yield self
+            yield
