@@ -1,9 +1,25 @@
 {% extends 'oversight/page.html' %}
 
 {% block content %}
+{{ block.super }}
 <div class="row">
   <div class="small-12 columns">
-    <h3>Oversight @ {% now "SHORT_DATETIME_FORMAT" %}</h3>
+
+    <h3>Oversight @ {% now "SHORT_DATETIME_FORMAT" %}
+    {% if user.is_authenticated %}
+      <form class="right" action="{% url 'oversight_toggle_logging' %}" method="post">
+        {% csrf_token %}
+        <input type="submit" class="button secondary tiny round" value="Toggle logging" />
+      </form>
+    {% endif %}
+    </h3>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div data-alert class="alert-box round {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
     <form action="{% url 'oversight_sensor_compare' %}">
       <table>
         <thead>
@@ -25,7 +41,7 @@
         {% endfor %}
         </tbody>
       </table>
-      <input type="submit" value="Compare sensors"/>
+      <input type="submit" class="button tiny round" value="Compare sensors"/>
     </form>
   </div>
 </div>

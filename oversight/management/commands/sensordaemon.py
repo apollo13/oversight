@@ -14,31 +14,36 @@ logger = logging.getLogger(__name__)
 SENSOR_INTERVAL = 60
 
 
-def read_sensors():
-    for sensor in Sensor.objects.all():
+class SensorManager(object):
+    def __init__(self):
+        self._logging_enabled = True
+
+    def _read_sensors(self):
+        if not self._logging_enabled:
+            return
+
+        for sensor in Sensor.objects.all():
+            backend = sensor.backend
+            try:
+                with backend.lock:
+                    value = backend.to_string(backend.read())
+            except Exception as e:
+                logger.error("Task failed: ", exc_info=e)
+                continue
+            log = LogEntry.objects.create(sensor=sensor, value=value)
+            sensor.current_log = log
+            sensor.save(update_fields=['current_log'])
+
+    def api(self, sensor, action, args):
+        sensor = Sensor.objects.get(api_endpoint=sensor)
         backend = sensor.backend
-        try:
-            with backend.lock:
-                value = backend.to_string(backend.read())
-        except Exception as e:
-            logger.error("Task failed: ", exc_info=e)
-            continue
-        log = LogEntry.objects.create(sensor=sensor, value=value)
-        sensor.current_log = log
-        sensor.save(update_fields=['current_log'])
+        with backend.lock:
+            data = backend.api(action, args)
+        return data
 
-
-def api(sensor, action, args):
-    sensor = Sensor.objects.get(api_endpoint=sensor)
-    backend = sensor.backend
-    with backend.lock:
-        data = backend.api(action, args)
-    return data
-
-
-TASKS = {
-    'read_sensors': read_sensors
-}
+    def toggle_logging(self):
+        self._logging_enabled = not self._logging_enabled
+        return self._logging_enabled
 
 
 def schedule_sensor_checks(queue):
@@ -47,11 +52,11 @@ def schedule_sensor_checks(queue):
     timer.start()
 
 
-def worker(queue):
+def worker(queue, tasks):
     while True:
         item = queue.get()
         try:
-            TASKS[item[0]](*item[1:])
+            tasks[item[0]](*item[1:])
         except Exception as e:
             logger.error("Task failed: ", exc_info=e)
         queue.task_done()
@@ -61,7 +66,11 @@ class Command(NoArgsCommand):
     def handle(self, **options):
         queue = Queue.Queue()
         server = SimpleXMLRPCServer(("localhost", 12345))
-        server.register_function(api)
+        sensor_manager = SensorManager()
+        server.register_instance(sensor_manager)
+        tasks = {
+            'read_sensors': sensor_manager._read_sensors
+        }
         schedule_sensor_checks(queue)
-        threading.Thread(target=worker, args=[queue]).start()
+        threading.Thread(target=worker, args=[queue, tasks]).start()
         server.serve_forever()
