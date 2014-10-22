@@ -21,6 +21,9 @@ USE_PUSHOVER = getattr(settings, 'PUSHOVER_TOKEN') and getattr(settings, 'PUSHOV
 
 class SensorManager(object):
     def _check_alarm(self, sensor, backend, value):
+        if not USE_PUSHOVER:
+            return
+
         notify = False
         if sensor.alarm_below:
             below = backend.from_string(sensor.alarm_below)
@@ -32,6 +35,8 @@ class SensorManager(object):
                 notify = True
 
         if notify and sensor.alarm_acked:
+            sensor.alarm_acked = False
+            sensor.save(update_fields=['alarm_acked'])
             requests.post('https://api.pushover.net/1/messages.json', {
                 'token': settings.PUSHOVER_TOKEN,
                 'user': settings.PUSHOVER_GROUP,

@@ -13,6 +13,13 @@ SECRET_KEY = '{{ oversight_secret_key }}'
 # SECURITY WARNING: keep the oversight key used in production secret!
 OVERSIGHT_KEY = '{{ oversight_api_key }}'
 
+{% if oversight_pushover_token is defined %}
+PUSHOVER_TOKEN = '{{ oversight_pushover_token }}'
+{% endif %}
+{% if oversight_pushover_group is defined %}
+PUSHOVER_GROUP = '{{ oversight_pushover_group }}'
+{% endif %}
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
