@@ -15,14 +15,11 @@ SENSOR_INTERVAL = 60
 
 
 class SensorManager(object):
-    def __init__(self):
-        self._logging_enabled = True
-
     def _read_sensors(self):
-        if not self._logging_enabled:
-            return
-
         for sensor in Sensor.objects.all():
+            if not sensor.logging_enabled:
+                continue
+
             backend = sensor.backend
             try:
                 with backend.lock:
@@ -40,10 +37,6 @@ class SensorManager(object):
         with backend.lock:
             data = backend.api(action, args)
         return data
-
-    def toggle_logging(self):
-        self._logging_enabled = not self._logging_enabled
-        return self._logging_enabled
 
 
 def schedule_sensor_checks(queue):

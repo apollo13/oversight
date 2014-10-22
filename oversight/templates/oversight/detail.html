@@ -22,7 +22,7 @@
       {% endfor %}
       </tbody>
     </table>
-    <div id="chart" style="width:900px; height:700px;" data-url="{% url 'oversight_sensor_detail' sensor.api_endpoint %}?format=json"><h3>Retrieving data…</h3></div>
+    <div id="chart" style="width:900px; height:700px;" data-url="{% url 'oversight_sensor_compare' %}" data-sensors="{{ sensor_ids_json }}"><h3>Retrieving data…</h3></div>
   </div>
 </div>
 {% endblock %}

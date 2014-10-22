@@ -1,3 +1,4 @@
+import json
 import socket
 import xmlrpclib
 from datetime import timedelta
@@ -30,15 +31,13 @@ def _prepare_json_data(*sensors):
 
 @login_required
 def toggle_logging(request):
-    proxy = xmlrpclib.ServerProxy('http://localhost:12345', allow_none=True)
-    try:
-        logging_enabled = proxy.toggle_logging()
-        msg = 'Logging enabled.' if logging_enabled else 'Logging disabled.'
-        status = messages.SUCCESS
-    except socket.error:
-        status = messages.WARNING
-        msg = 'Could not contact sensor daemon.'
-    messages.add_message(request, status, msg)
+    sensors = Sensor.objects.filter(api_endpoint__in=request.POST.getlist('sensor'))
+    # Sadly flipping booleans doesn't work via a single query.
+    for sensor in sensors:
+        sensor.logging_enabled = not sensor.logging_enabled
+        sensor.save(update_fields=['logging_enabled'])
+    msg = "Toggled status of selected sensors."
+    messages.add_message(request, messages.SUCCESS, msg)
     return redirect('oversight_index')
 
 
@@ -49,26 +48,26 @@ def index(request):
 
 def sensor_detail(request, slug):
     sensor = Sensor.objects.get(api_endpoint=slug)
-    if request.GET.get('format') == 'json':
-        return JsonResponse(_prepare_json_data(sensor), safe=False)
-    else:
-        sensor_data = LogEntry.objects.filter(sensor=sensor).order_by('-datetime')[:5]
-        context = {
-            'sensor': sensor,
-            'sensor_data': sensor_data
-        }
-        return render(request, 'oversight/detail.html', context)
+    sensor_data = LogEntry.objects.filter(sensor=sensor).order_by('-datetime')[:5]
+    context = {
+        'sensor': sensor,
+        'sensor_ids_json': json.dumps([slug]),
+        'sensor_data': sensor_data
+    }
+    return render(request, 'oversight/detail.html', context)
 
 
 def sensor_compare(request):
-    sensors = request.GET.getlist('sensor')
+    if request.is_ajax():
+        sensors = Sensor.objects.filter(api_endpoint__in=request.GET.getlist('sensor'))
+        return JsonResponse(_prepare_json_data(*sensors), safe=False)
+
+    sensors = request.POST.getlist('sensor')
+    sensor_ids_json = json.dumps(sensors)
     sensors = Sensor.objects.filter(api_endpoint__in=sensors) \
         .select_related('current_log').order_by('name')
-    if request.GET.get('format') == 'json':
-        return JsonResponse(_prepare_json_data(*sensors), safe=False)
-    else:
-        context = {'sensors': sensors}
-        return render(request, 'oversight/compare.html', context)
+    context = {'sensors': sensors, 'sensor_ids_json': sensor_ids_json}
+    return render(request, 'oversight/compare.html', context)
 
 
 @csrf_exempt

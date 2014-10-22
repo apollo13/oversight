@@ -7,6 +7,7 @@ var render_plot = function(id) {
 
 	$.ajax({
 		url: url,
+		data: $.param({'sensor': $('#'+id).data('sensors')}, true),
 		dataType:"json",
 		success: function(response) {
 			var log_plot = false;

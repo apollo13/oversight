@@ -15,6 +15,7 @@ class Sensor(models.Model):
     current_log = models.ForeignKey('LogEntry', null=True, blank=True,
                                     related_name='+')
     log_plot = models.BooleanField(default=False)
+    logging_enabled = models.BooleanField(default=True)
 
     def clean(self):
         try:
