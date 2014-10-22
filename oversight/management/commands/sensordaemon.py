@@ -25,23 +25,27 @@ class SensorManager(object):
             return
 
         notify = False
+        msg = 'Sensor "%s" triggered an alarm: %s'
         if sensor.alarm_below:
             below = backend.from_string(sensor.alarm_below)
             if value <= below:
                 notify = True
+                part = '%s <= %s' % (backend.to_string(value), sensor.alarm_below)
         if sensor.alarm_above:
             above = backend.from_string(sensor.alarm_above)
             if value >= above:
                 notify = True
+                part = '%s >= %s' % (backend.to_string(value), sensor.alarm_above)
 
         if notify and sensor.alarm_acked:
+            msg = msg % (sensor.name, part)
             sensor.alarm_acked = False
             sensor.save(update_fields=['alarm_acked'])
             requests.post('https://api.pushover.net/1/messages.json', {
                 'token': settings.PUSHOVER_TOKEN,
                 'user': settings.PUSHOVER_GROUP,
-                'title': 'Oversight',
-                'message': 'Sensor "%s" triggered an alarm.' % sensor.name,
+                'title': 'Alarm from "%s"' % sensor.name,
+                'message': msg,
                 'priority': 1,
             })
 
