@@ -22,6 +22,23 @@
       {% endfor %}
       </tbody>
     </table>
+    {% if user.is_authenticated %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="row"> <!-- foundation is weird -->
+        <div class="small-12 columns">
+          <div class="row collapse postfix-round">
+            <div class="small-4 columns">
+              {{ export_form.export_since }}
+            </div>
+            <div class="small-2 columns end">
+              <input type="submit" value="Export" class="button postfix"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    {% endif %}
     <div id="chart" style="width:900px; height:700px;" data-url="{% url 'oversight_sensor_compare' %}" data-sensors="{{ sensor_ids_json }}"><h3>Retrieving data…</h3></div>
   </div>
 </div>

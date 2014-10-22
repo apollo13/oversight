@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.utils.timezone import now
 from django.utils.crypto import constant_time_compare
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
+from .forms import ExportForm
 from .models import Sensor, LogEntry
 
 
@@ -47,12 +48,34 @@ def index(request):
 
 
 def sensor_detail(request, slug):
+    initial = {'export_since': now() - timedelta(days=2)}
     sensor = Sensor.objects.get(api_endpoint=slug)
-    sensor_data = LogEntry.objects.filter(sensor=sensor).order_by('-datetime')[:5]
+    sensor_data = LogEntry.objects.filter(sensor=sensor).order_by('-datetime')
+
+    if request.method == 'POST' and request.user.is_authenticated():
+        export_form = ExportForm(request.POST, initial=initial)
+        if export_form.is_valid():
+            dt = export_form.cleaned_data['export_since']
+            sensor_data = sensor_data.filter(datetime__gte=dt)\
+                                     .values_list('datetime', 'value')\
+                                     .iterator()
+            def stream():
+                for log in sensor_data:
+                    yield '%s\t%s\n' % (int(log[0].strftime('%s')), log[1])
+            response = StreamingHttpResponse(stream(), content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="export.csv"'
+            return response
+
+    else:
+        export_form = ExportForm(initial=initial)
+
+    sensor_data = sensor_data[:5]
+
     context = {
         'sensor': sensor,
         'sensor_ids_json': json.dumps([slug]),
-        'sensor_data': sensor_data
+        'sensor_data': sensor_data,
+        'export_form': export_form,
     }
     return render(request, 'oversight/detail.html', context)
 
