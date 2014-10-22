@@ -17,6 +17,10 @@ class Sensor(models.Model):
     log_plot = models.BooleanField(default=False)
     logging_enabled = models.BooleanField(default=True)
 
+    alarm_below = models.CharField(max_length=255, blank=True)
+    alarm_above = models.CharField(max_length=255, blank=True)
+    alarm_acked = models.BooleanField(default=True)
+
     def clean(self):
         try:
             json.loads(self.params)
