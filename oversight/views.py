@@ -31,6 +31,15 @@ def _prepare_json_data(*sensors):
 
 
 @login_required
+def ack_alarms(request):
+    sensors = Sensor.objects.filter(api_endpoint__in=request.POST.getlist('sensor'))
+    sensors.update(alarm_acked=True)
+    msg = "Cleared alarm for selected sensors."
+    messages.add_message(request, messages.SUCCESS, msg)
+    return redirect('oversight_index')
+
+
+@login_required
 def toggle_logging(request):
     sensors = Sensor.objects.filter(api_endpoint__in=request.POST.getlist('sensor'))
     # Sadly flipping booleans doesn't work via a single query.

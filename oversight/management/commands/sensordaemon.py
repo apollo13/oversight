@@ -3,7 +3,10 @@ import threading
 import Queue
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
+from django.conf import settings
 from django.core.management.base import NoArgsCommand
+
+import requests
 
 from oversight.models import Sensor, LogEntry
 
@@ -13,8 +16,30 @@ logger = logging.getLogger(__name__)
 
 SENSOR_INTERVAL = 60
 
+USE_PUSHOVER = getattr(settings, 'PUSHOVER_TOKEN') and getattr(settings, 'PUSHOVER_GROUP')
+
 
 class SensorManager(object):
+    def _check_alarm(self, sensor, backend, value):
+        notify = False
+        if sensor.alarm_below:
+            below = backend.from_string(sensor.alarm_below)
+            if value <= below:
+                notify = True
+        if sensor.alarm_above:
+            above = backend.from_string(sensor.alarm_above)
+            if value >= above:
+                notify = True
+
+        if notify and sensor.alarm_acked:
+            requests.post('https://api.pushover.net/1/messages.json', {
+                'token': settings.PUSHOVER_TOKEN,
+                'user': settings.PUSHOVER_GROUP,
+                'title': 'Oversight',
+                'message': 'Sensor "%s" triggered an alarm.' % sensor.name,
+                'priority': 1,
+            })
+
     def _read_sensors(self):
         for sensor in Sensor.objects.all():
             if not sensor.logging_enabled:
@@ -23,11 +48,12 @@ class SensorManager(object):
             backend = sensor.backend
             try:
                 with backend.lock:
-                    value = backend.to_string(backend.read())
+                    value = backend.read()
+                self._check_alarm(sensor, backend, value)
             except Exception as e:
                 logger.error("Task failed: ", exc_info=e)
                 continue
-            log = LogEntry.objects.create(sensor=sensor, value=value)
+            log = LogEntry.objects.create(sensor=sensor, value=backend.to_string(value))
             sensor.current_log = log
             sensor.save(update_fields=['current_log'])
 

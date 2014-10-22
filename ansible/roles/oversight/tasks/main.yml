@@ -24,6 +24,7 @@
     - MinimalModbus
     - Django
     - CherryPy
+    - requests
 
 - name: update oversight
   git: repo=https://github.com/apollo13/oversight.git dest=/oversight/code update=yes

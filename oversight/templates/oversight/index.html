@@ -34,16 +34,17 @@
         {% for sensor in sensor_data %}
           <tr>
             <td><input type="checkbox" name="sensor" value="{{ sensor.api_endpoint }}"/></td>
-            <td><a href="{% url 'oversight_sensor_detail' sensor.api_endpoint %}">{{ sensor.name }}</a>{% if not sensor.logging_enabled %} <i class="fa fa-bell-slash-o"></i>{% endif %}</td>
+            <td><a href="{% url 'oversight_sensor_detail' sensor.api_endpoint %}">{{ sensor.name }}</a>{% if not sensor.alarm_acked %} <i class="fa fa-bolt"></i>{% endif %}{% if not sensor.logging_enabled %} <i class="fa fa-bell-slash-o"></i>{% endif %}</td>
             <td>{{ sensor.current_log.value }} {{ sensor.unit }}</td>
             <td {% if sensor.frozen %}class="frozen"{% endif %}>{{ sensor.current_log.datetime|date:"SHORT_DATETIME_FORMAT" }}</td>
           </tr>
         {% endfor %}
         </tbody>
       </table>
-      <button type="submit" class="tiny round" name="action" value="compare_sensors" formaction="{% url 'oversight_sensor_compare' %}">Compare sensors</button>
+      <button type="submit" class="tiny round" name="action" formaction="{% url 'oversight_sensor_compare' %}">Compare sensors</button>
       {% if user.is_authenticated %}
-      <button type="submit" class="secondary tiny round" name="action" value="toggle_logging" formaction="{% url 'oversight_toggle_logging' %}">Toggle logging</button>
+      <button type="submit" class="secondary tiny round" name="action" formaction="{% url 'oversight_toggle_logging' %}">Toggle logging</button>
+      <button type="submit" class="secondary tiny round" name="action" formaction="{% url 'oversight_ack_alarms' %}">Acknowledge alarms</button>
       {% endif %}
     </form>
   </div>
