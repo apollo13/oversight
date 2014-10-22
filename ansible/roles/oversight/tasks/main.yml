@@ -18,7 +18,7 @@
   pip: name=pip virtualenv=/oversight/venv state=latest
 
 - name: oversight deps
-  pip: name={{ item }} virtualenv=/oversight/venv
+  pip: name={{ item }} virtualenv=/oversight/venv state=latest
   with_items:
     - pyserial
     - MinimalModbus
