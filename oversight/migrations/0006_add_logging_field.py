@@ -20,7 +20,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='sensor',
             name=b'current_log',
-            field=models.ForeignKey(related_name='+', blank=True, to='oversight.LogEntry', null=True),
-            preserve_default=True,
+            field=models.ForeignKey(related_name=b'+', blank=True, to='oversight.LogEntry', null=True),
         ),
     ]
