@@ -113,8 +113,10 @@ TEMPLATE_LOADERS = (
   )),
 )
 
+{% if nginx_no_ssl is undefined %}
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+{% endif %}
 
 TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.request',)
