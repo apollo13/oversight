@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 SENSOR_INTERVAL = 60
 
-USE_PUSHOVER = getattr(settings, 'PUSHOVER_TOKEN') and getattr(settings, 'PUSHOVER_GROUP')
+USE_PUSHOVER = getattr(settings, 'PUSHOVER_TOKEN', None) and getattr(settings, 'PUSHOVER_GROUP', None)
 
 
 class SensorManager(object):
