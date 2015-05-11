@@ -47,14 +47,14 @@
 
 - name: install supervisor config file
   copy: dest=/etc/supervisor/conf.d/oversight.conf src=oversight.conf
-  sudo_user: root
+  become_user: root
   register: supervisor_config
 
 - name: reread supervisor config
   supervisorctl: state=present name="oversight:" server_url="unix:////var/run/supervisor.sock"
-  sudo_user: root
+  become_user: root
   when: supervisor_config|changed
 
 - name: restart oversight programs
   supervisorctl: state=restarted name="oversight:" server_url="unix:////var/run/supervisor.sock"
-  sudo_user: root
+  become_user: root

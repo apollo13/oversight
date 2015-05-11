@@ -1,9 +1,8 @@
 ---
 - name: Basic Configuration
   hosts: oversight
-  remote_user: pi
   gather_facts: no
-  sudo: true
+  become: true
 
   roles:
     - common
@@ -13,9 +12,8 @@
 
 - name: Oversight Bootstrap
   hosts: oversight
-  remote_user: pi
   gather_facts: no
-  sudo: true
+  become: true
 
   tasks:
     - user: name=oversight home=/oversight groups=dialout
@@ -29,10 +27,9 @@
 
 - name: Oversight Deployment
   hosts: oversight
-  remote_user: pi
   gather_facts: no
-  sudo: true
-  sudo_user: oversight
+  become: true
+  become_user: oversight
 
   roles:
     - oversight

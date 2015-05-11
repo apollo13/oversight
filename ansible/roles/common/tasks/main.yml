@@ -1,7 +1,7 @@
 ---
 
 - name: ensure python-apt
-  shell: apt-get -y install python-apt creates=/usr/share/pyshared/apt
+  shell: apt-get -y install python-apt creates=/usr/share/doc/python-apt
 
 - name: common packages
   apt: pkg={{ item }}
@@ -9,33 +9,11 @@
     - python-pip
     - python-virtualenv
     - vim
+    - git
 
-- name: remove unneeded packages
-  apt: pkg=triggerhappy state=absent
-
-- name: decrease gpu memory
-  lineinfile: dest=/boot/config.txt line=gpu_mem=16
-
-- name: disable serial and ttys
-  replace: dest=/etc/inittab regexp={{ item }} replace="#\1" backup=yes
-  with_items:
-    - ^(T0:23.*)$
-    - ^([2-6]:23.*)$
-
-- name: disable ipv6 1/2
-  copy: dest=/etc/sysctl.d/disableipv6.conf content="net.ipv6.conf.all.disable_ipv6=1\n" mode=0644
-
-- name: disable ipv6 2/2
-  lineinfile: dest=/etc/modprobe.d/blacklist line="blacklist ipv6" create=yes mode=0644
-
-- name: set noatime and nodiratime
-  replace: dest=/etc/fstab backup=yes regexp=noatime(?!,nodiratime) replace=noatime,nodiratime
-
-- name: enable noop scheduler
-  replace: dest=/boot/cmdline.txt regexp="elevator=deadline" replace="elevator=noop"
-
-- name: disable ssh root login
-  lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin (yes|no)$" line="PermitRootLogin no"
+- name: disable ssh root login with password
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin.*$" line="PermitRootLogin without-password"
   notify: restart ssh
 
-# TODO: kill syslog
+- include: rbpi.yml
+  when: "{{ ansible_ssh_user == 'pi' }}"
