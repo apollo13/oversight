@@ -34,7 +34,8 @@ class Sensor(models.Model):
 
     @property
     def frozen(self):
-        return (now() - self.current_log.datetime).total_seconds() > 300
+        if self.current_log:
+            return (now() - self.current_log.datetime).total_seconds() > 300
 
     def __unicode__(self):
         return self.name
