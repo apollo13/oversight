@@ -8,6 +8,13 @@
     - db
     - static
 
+- name: set pythonpath and settings module in bashrc
+  lineinfile: dest=/oversight/.bashrc line="{{ item }}"
+  with_items:
+    - export PYTHONPATH=/oversight/config:/oversight/code
+    - export DJANGO_SETTINGS_MODULE=settings
+    - export PATH=/oversight/venv/bin:$PATH
+
 - name: install config file
   template: dest=/oversight/config/settings.py src=settings.py.j2
 

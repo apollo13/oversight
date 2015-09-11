@@ -19,3 +19,8 @@
   copy: dest=/etc/nginx/ssl/server.crt content="{{ ssl_pubkey }}" mode=600 owner=root
   when: nginx_no_ssl is undefined
   notify: restart nginx
+
+- name: install dhparams.pem
+  copy: dest=/etc/nginx/ssl/dhparams.pem content="{{ ssl_dhparams }}" mode=600 owner=root
+  when: nginx_no_ssl is undefined
+  notify: restart nginx
