@@ -1,6 +1,7 @@
 import json
 import socket
-import xmlrpclib
+#import xmlrpclib
+from xmlrpc import client
 from datetime import timedelta
 
 from django.conf import settings
@@ -107,5 +108,5 @@ def sensor_api(request, slug, action):
     data = request.POST
     if not constant_time_compare(data.get('api-key', ''), settings.OVERSIGHT_KEY):
         raise PermissionDenied
-    proxy = xmlrpclib.ServerProxy('http://localhost:12345', allow_none=True)
+    proxy = client.ServerProxy('http://localhost:12345', allow_none=True)
     return HttpResponse(proxy.api(slug, action, data.getlist('args')))

@@ -1,10 +1,10 @@
 import logging
 import threading
-import Queue
-from SimpleXMLRPCServer import SimpleXMLRPCServer
+from multiprocessing import Queue
+from xmlrpc.server import SimpleXMLRPCServer
 
 from django.conf import settings
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 import requests
 
@@ -85,14 +85,15 @@ def worker(queue, tasks):
         item = queue.get()
         try:
             tasks[item[0]](*item[1:])
+            logger.info(str(item))
         except Exception as e:
             logger.error("Task failed: ", exc_info=e)
-        queue.task_done()
+        #queue.task_done()
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     def handle(self, **options):
-        queue = Queue.Queue()
+        queue = Queue()
         server = SimpleXMLRPCServer(("localhost", 12345))
         sensor_manager = SensorManager()
         server.register_instance(sensor_manager)

@@ -1,4 +1,4 @@
-from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+#from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -31,7 +31,7 @@ INSTALLED_APPS = (
     'oversight.apps.OversightConfig',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,6 +73,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 OVERSIGHT_KEY = 'hallo'
 
 LOGGING = {
@@ -81,7 +82,7 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.FileHandler',
-            'filename': '/dev/stderr',
+            'filename': '/tmp/oversight.log',
         }
     },
     'loggers': {
@@ -92,4 +93,16 @@ LOGGING = {
     }
 }
 
-TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.request',)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages"
+            ]
+        }
+    },
+]
+#TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.request',)
