@@ -1,5 +1,3 @@
-#from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -105,4 +103,3 @@ TEMPLATES = [
         }
     },
 ]
-#TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.request',)
