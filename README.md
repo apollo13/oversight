@@ -1,14 +1,14 @@
 # oversight
 
-Django based web application for Datalogging.
+Django based web application for data logging.
 
 # Features
-* Overview of the lastest sensor values
-* Detailed view with the lastest values and a diagram showing the history
+* Overview of the latest sensor values
+* Detailed view with the latest values and a diagram showing the history
 * Compare multiple sensors using a diagram
-* Add Sensor with the django admin web interface
-* Api to set and get sensor data
+* Add sensor with the Django admin web interface
+* API to set and get sensor data
 * Logging daemon and web application are run in parallel
-* ansible scripts for easier setup on raspberry pi
-* Easy to include new Sensors
+* Ansible scripts for easier setup on Raspberry Pi
+* Easy to include new sensors
 
