@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "oversight"
+version = "0.1.0"
+description = ""
+authors = [""]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "*"
+pyserial = "^3.4"
+minimalmodbus = "^0.7.0"
+django = "^2.1"
+cheroot = "^6.5"
+requests = "^2.19"
+cherrypy = "^18.0"
+
+[tool.poetry.dev-dependencies]
