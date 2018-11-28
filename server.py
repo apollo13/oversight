@@ -1,6 +1,6 @@
 import os, sys
 
-sys.path.insert(0, './example')
+sys.path.insert(0, './config')
 sys.path.insert(0, '.')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
