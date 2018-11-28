@@ -1,4 +1,5 @@
 {% extends 'oversight/page.html' %}
+{% load ktoc %}
 
 {% block content %}
 {{ block.super }}
@@ -35,7 +36,10 @@
           <tr>
             <td><input type="checkbox" name="sensor" value="{{ sensor.api_endpoint }}"/></td>
             <td><a href="{% url 'oversight_sensor_detail' sensor.api_endpoint %}">{{ sensor.name }}</a>{% if not sensor.alarm_acked %} <i class="fa fa-bolt"></i>{% endif %}{% if not sensor.logging_enabled %} <i class="fa fa-bell-slash-o"></i>{% endif %}</td>
-            <td>{{ sensor.current_log.value }} {{ sensor.unit }}</td>
+            <td>{{ sensor.current_log.value }} {{ sensor.unit }}
+		{% if sensor.unit == "K" %}
+		 ({{ sensor.current_log.value|ktoc|floatformat }} °C)
+		{% endif %} </td>
             <td {% if sensor.frozen %}class="frozen"{% endif %}>{{ sensor.current_log.datetime|date:"SHORT_DATETIME_FORMAT" }}</td>
           </tr>
         {% endfor %}
