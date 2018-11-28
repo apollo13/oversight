@@ -85,7 +85,6 @@ def worker(queue, tasks):
         item = queue.get()
         try:
             tasks[item[0]](*item[1:])
-            logger.info(str(item))
         except Exception as e:
             logger.error("Task failed: ", exc_info=e)
         #queue.task_done()

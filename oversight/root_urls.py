@@ -11,4 +11,4 @@ urlpatterns = [
     url(r'^oversight/', include('oversight.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^$', RedirectView.as_view(pattern_name='oversight_index')),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]#+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

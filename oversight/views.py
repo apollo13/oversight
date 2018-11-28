@@ -102,6 +102,10 @@ def sensor_compare(request):
     context = {'sensors': sensors, 'sensor_ids_json': sensor_ids_json}
     return render(request, 'oversight/compare.html', context)
 
+def get_last(request,slug):
+    sensor = Sensor.objects.get(api_endpoint=slug)
+    sensor_data = sensor.current_log
+    return HttpResponse(sensor_data.value)
 
 @csrf_exempt
 def sensor_api(request, slug, action):

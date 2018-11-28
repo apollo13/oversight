@@ -43,6 +43,10 @@ class Sensor(models.Model):
     def __unicode__(self):
         return self.name
 
+    def __str__(self):
+        return self.name
+
+
 
 class LogEntry(models.Model):
     datetime = models.DateTimeField(default=now)
