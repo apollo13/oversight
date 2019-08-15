@@ -1,0 +1,12 @@
+[Unit]
+Description=Data logger service
+
+[Service]
+Type=simple
+User=oversight
+WorkingDirectory=/home/oversight
+ExecStart=/home/oversight/.cache/pypoetry/virtualenvs/oversight-py3.5/bin/python3 /home/oversight/oversight/manage.py sensordaemon --settings=settings
+Environment="PYTHONPATH=/home/oversight/oversight/config/:/home/oversight/oversight/"
+
+[Install]
+WantedBy=multi-user.target

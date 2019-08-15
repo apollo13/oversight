@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from six import string_types
 import threading
 
 
@@ -20,7 +21,7 @@ class Sensor(object):
             return self.write(self.from_string(args[0]))
 
     def to_string(self, value):
-        if not isinstance(value, basestring):
+        if not isinstance(value, string_types):
             value = repr(value)
         return value
 

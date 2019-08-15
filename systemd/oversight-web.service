@@ -1,0 +1,12 @@
+[Unit]
+Description=Oversight web application
+Wants=oversight-logger.service
+
+[Service]
+Type=simple
+User=oversight
+WorkingDirectory=/home/oversight/oversight
+ExecStart= /home/oversight/.cache/pypoetry/virtualenvs/oversight-py3.5/bin/python3 /home/oversight/oversight/server.py
+
+[Install]
+WantedBy=multi-user.target
