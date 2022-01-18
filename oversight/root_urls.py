@@ -1,11 +1,11 @@
-from django.conf.urls import patterns, include, url
+from django.urls import include, path
 from django.views.generic.base import RedirectView
 
 from django.contrib import admin
 
 
-urlpatterns = patterns('',
-    url(r'^oversight/', include('oversight.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', RedirectView.as_view(pattern_name='oversight_index')),
-)
+urlpatterns = [
+    path("oversight/", include("oversight.urls")),
+    path("admin/", admin.site.urls),
+    path("", RedirectView.as_view(pattern_name="oversight_index")),
+]
