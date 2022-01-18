@@ -7,15 +7,21 @@ authors = [
 ]
 dependencies = [
     "Django>=4.0",
+    "gunicorn>=20.1.0",
+    "python-decouple>=3.5",
 ]
 requires-python = ">=3.8"
 license = {text = "MIT"}
 
 [project.urls]
-homepage = ""
+homepage = "https://github.com/apollo13/oversight"
 
-[tool]
-[tool.pdm]
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
 
 [build-system]
 requires = ["pdm-pep517"]

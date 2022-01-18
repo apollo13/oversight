@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,10 +10,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-$u1uucq0w@8-u3ny&v2sz+cted&w%oxp3mt93tiz4qn3&^ge_q"
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -111,21 +113,26 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-OVERSIGHT_KEY = "hallo"
+OVERSIGHT_KEY = config("OVERSIGHT_KEY")
 
-# LOGGING = {
-#    'version': 1,
-#    'disable_existing_loggers': True,
-#    'handlers': {
-#        'console': {
-#            'class': 'logging.FileHandler',
-#            'filename': '/dev/stderr',
-#        }
-#    },
-#    'loggers': {
-#        'oversight': {
-#            'handlers': ['console'],
-#            'level': 'DEBUG',
-#        }
-#    }
-# }
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}

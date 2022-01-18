@@ -1,22 +1,19 @@
 import json
-import socket
-
-from xmlrpc.client import ServerProxy
 from datetime import timedelta
+from xmlrpc.client import ServerProxy
 
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
-from django.utils.timezone import now
+from django.shortcuts import redirect, render
 from django.utils.crypto import constant_time_compare
+from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-
 from .forms import ExportForm
-from .models import Sensor, LogEntry
+from .models import LogEntry, Sensor
 
 
 def _prepare_json_data(*sensors):

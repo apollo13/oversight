@@ -3,7 +3,7 @@ from django.contrib import admin
 
 
 class OversightConfig(AppConfig):
-    name = 'oversight'
+    name = "oversight"
 
     def ready(self):
         admin.autodiscover()

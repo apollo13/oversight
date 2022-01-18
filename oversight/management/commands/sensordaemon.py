@@ -3,13 +3,11 @@ import threading
 from queue import Queue
 from xmlrpc.server import SimpleXMLRPCServer
 
+import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-import requests
-
-from oversight.models import Sensor, LogEntry
-
+from oversight.models import LogEntry, Sensor
 
 logger = logging.getLogger(__name__)
 

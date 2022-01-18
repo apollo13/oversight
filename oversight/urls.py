@@ -1,14 +1,13 @@
 from django.urls import path
 
 from .views import (
+    ack_alarms,
     index,
-    toggle_logging,
-    sensor_detail,
     sensor_api,
     sensor_compare,
-    ack_alarms,
+    sensor_detail,
+    toggle_logging,
 )
-
 
 urlpatterns = [
     path("", index, name="oversight_index"),
