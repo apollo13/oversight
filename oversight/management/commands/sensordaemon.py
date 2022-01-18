@@ -1,10 +1,10 @@
 import logging
 import threading
-import Queue
-from SimpleXMLRPCServer import SimpleXMLRPCServer
+from queue import Queue
+from xmlrpc.server import SimpleXMLRPCServer
 
 from django.conf import settings
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 import requests
 
@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)
 
 SENSOR_INTERVAL = 60
 
-USE_PUSHOVER = getattr(settings, 'PUSHOVER_TOKEN', None) and getattr(settings, 'PUSHOVER_GROUP', None)
+USE_PUSHOVER = getattr(settings, "PUSHOVER_TOKEN", None) and getattr(
+    settings, "PUSHOVER_GROUP", None
+)
 
 
 class SensorManager(object):
@@ -30,24 +32,27 @@ class SensorManager(object):
             below = backend.from_string(sensor.alarm_below)
             if value <= below:
                 notify = True
-                part = '%s <= %s' % (backend.to_string(value), sensor.alarm_below)
+                part = "%s <= %s" % (backend.to_string(value), sensor.alarm_below)
         if sensor.alarm_above:
             above = backend.from_string(sensor.alarm_above)
             if value >= above:
                 notify = True
-                part = '%s >= %s' % (backend.to_string(value), sensor.alarm_above)
+                part = "%s >= %s" % (backend.to_string(value), sensor.alarm_above)
 
         if notify and sensor.alarm_acked:
             msg = msg % (sensor.name, part)
             sensor.alarm_acked = False
-            sensor.save(update_fields=['alarm_acked'])
-            requests.post('https://api.pushover.net/1/messages.json', {
-                'token': settings.PUSHOVER_TOKEN,
-                'user': settings.PUSHOVER_GROUP,
-                'title': 'Alarm from "%s"' % sensor.name,
-                'message': msg,
-                'priority': 1,
-            })
+            sensor.save(update_fields=["alarm_acked"])
+            requests.post(
+                "https://api.pushover.net/1/messages.json",
+                {
+                    "token": settings.PUSHOVER_TOKEN,
+                    "user": settings.PUSHOVER_GROUP,
+                    "title": 'Alarm from "%s"' % sensor.name,
+                    "message": msg,
+                    "priority": 1,
+                },
+            )
 
     def _read_sensors(self):
         for sensor in Sensor.objects.all():
@@ -64,7 +69,7 @@ class SensorManager(object):
                 continue
             log = LogEntry.objects.create(sensor=sensor, value=backend.to_string(value))
             sensor.current_log = log
-            sensor.save(update_fields=['current_log'])
+            sensor.save(update_fields=["current_log"])
 
     def api(self, sensor, action, args):
         sensor = Sensor.objects.get(api_endpoint=sensor)
@@ -75,7 +80,7 @@ class SensorManager(object):
 
 
 def schedule_sensor_checks(queue):
-    queue.put(('read_sensors',))
+    queue.put(("read_sensors",))
     timer = threading.Timer(SENSOR_INTERVAL, schedule_sensor_checks, args=[queue])
     timer.start()
 
@@ -90,15 +95,13 @@ def worker(queue, tasks):
         queue.task_done()
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     def handle(self, **options):
-        queue = Queue.Queue()
+        queue = Queue()
         server = SimpleXMLRPCServer(("localhost", 12345))
         sensor_manager = SensorManager()
         server.register_instance(sensor_manager)
-        tasks = {
-            'read_sensors': sensor_manager._read_sensors
-        }
+        tasks = {"read_sensors": sensor_manager._read_sensors}
         schedule_sensor_checks(queue)
         threading.Thread(target=worker, args=[queue, tasks]).start()
         server.serve_forever()

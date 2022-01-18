@@ -38,7 +38,7 @@ class Sensor(models.Model):
         if self.current_log:
             return (now() - self.current_log.datetime).total_seconds() > 300
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 

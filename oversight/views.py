@@ -1,7 +1,7 @@
 import json
 import socket
 
-# import xmlrpclib
+from xmlrpc.client import ServerProxy
 from datetime import timedelta
 
 from django.conf import settings
@@ -71,7 +71,7 @@ def sensor_detail(request, slug):
     sensor = Sensor.objects.get(api_endpoint=slug)
     sensor_data = LogEntry.objects.filter(sensor=sensor).order_by("-datetime")
 
-    if request.method == "POST" and request.user.is_authenticated():
+    if request.method == "POST" and request.user.is_authenticated:
         export_form = ExportForm(request.POST, initial=initial)
         if export_form.is_valid():
             dt = export_form.cleaned_data["export_since"]
@@ -104,7 +104,7 @@ def sensor_detail(request, slug):
 
 
 def sensor_compare(request):
-    if request.is_ajax():
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
         sensors = Sensor.objects.filter(api_endpoint__in=request.GET.getlist("sensor"))
         return JsonResponse(_prepare_json_data(*sensors), safe=False)
 
@@ -124,5 +124,5 @@ def sensor_api(request, slug, action):
     data = request.POST
     if not constant_time_compare(data.get("api-key", ""), settings.OVERSIGHT_KEY):
         raise PermissionDenied
-    proxy = xmlrpclib.ServerProxy("http://localhost:12345", allow_none=True)
+    proxy = ServerProxy("http://localhost:12345", allow_none=True)
     return HttpResponse(proxy.api(slug, action, data.getlist("args")))

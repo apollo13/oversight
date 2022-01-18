@@ -6,7 +6,7 @@ from .base import Sensor
 
 class TestSensor(Sensor):
     def __init__(self, **kwargs):
-        self.port = 'testport'
+        self.port = "testport"
 
     def read(self):
         time.sleep(5)
@@ -16,7 +16,7 @@ class TestSensor(Sensor):
         pass
 
     def to_string(self, value):
-        return u"%i" % value
+        return "%i" % value
 
     def from_string(self, value):
-        return unicode(value)
+        return str(value)
