@@ -2,3 +2,5 @@
 db.sqlite3*
 ansible/hosts
 ansible/group_vars/oversight
+.pdm.toml
+__pypackages__
